@@ -45,8 +45,14 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 /* Countdown */
 .hero { padding-top: 40px; padding-bottom: 32px; }
-.count { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: var(--display); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; }
-.count .u { margin-left: 4px; font-size: var(--meta); font-weight: 400; letter-spacing: 0; color: var(--muted); }
+.count { display: flex; flex-wrap: wrap; gap: 8px 28px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: var(--display); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; }
+.count > span { display: flex; flex-direction: column; }
+.count .u { margin-top: 4px; font-size: var(--meta); font-weight: 400; letter-spacing: 0; color: var(--muted); }
+@media (max-width: 479px) {
+  .count { gap: 8px 20px; }
+  .top .place, .top .state { display: none; }
+  .ghost { padding: 6px; }
+}
 .sub { margin: 12px 0 0; color: var(--muted); }
 
 /* Overview */
@@ -158,7 +164,7 @@ footer { padding-top: 32px; padding-bottom: 48px; border-top: 1px solid var(--ha
 </head>
 <body>
 <header class="wrap top">
-  <h1>Move-in list · Dunnellon</h1>
+  <h1>Move-in list<span class="place"> · Dunnellon</span></h1>
   <div class="acts">
     <button class="ghost" id="exportBtn" type="button">Export</button>
     <button class="ghost" id="importBtn" type="button">Import</button>
@@ -528,7 +534,7 @@ function tagsFor(it, ctx) {
   let t = '';
   if (it.pri && (ctx === 'category' || ctx === 'bf')) {
     if (it.pri === 'now') t += '<span class="tag on">Buy first</span>';
-    else if (ctx !== 'bf') t += '<span class="tag">' + PRI_TAG[it.pri] + '</span>';
+    else if (ctx !== 'bf' && it.pri !== 'extra') t += '<span class="tag">' + PRI_TAG[it.pri] + '</span>';
   }
   if (it.group === 'now' && ctx === 'bf') t += '<span class="tag on">Buy first</span>';
   if (it.big && ctx !== 'category') t += '<span class="tag">Big ticket</span>';
@@ -647,7 +653,8 @@ function renderAll() { renderTabs(); renderProgress(); renderDates(); renderPane
 function applyTheme() {
   if (S.theme === 'auto') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', S.theme);
-  $('#themeBtn').textContent = 'Theme: ' + S.theme[0].toUpperCase() + S.theme.slice(1);
+  $('#themeBtn').innerHTML = 'Theme<span class="state">: ' + S.theme[0].toUpperCase() + S.theme.slice(1) + '</span>';
+  $('#themeBtn').setAttribute('aria-label', 'Theme: ' + S.theme);
 }
 
 // ---------- Events ----------
