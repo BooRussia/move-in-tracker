@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Move-in list · Dunnellon</title>
+<meta name="description" content="Move-in checklist, smart home plan, shopping list, price log and a live Black Friday countdown.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 15 16 5l12 10v12H19v-8h-6v8H4z' fill='%23111'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff; --fg: #111111; --muted: #6b6b6b; --hairline: #e5e5e5;
+  --accent: #1f6bff; --accent-on: #ffffff;
+  --r: 12px;
+  --display: 40px; --body: 15px; --meta: 13px;
+  --text: 'Geist', sans-serif; --mono: 'Geist Mono', monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #000000; --fg: #f2f2f2; --muted: #9a9a9a; --hairline: #262626; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #000000; --fg: #f2f2f2; --muted: #9a9a9a; --hairline: #262626; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 var(--body)/1.5 var(--text); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--muted); }
+a:hover { text-decoration-color: var(--fg); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 720px) { .wrap { padding: 0 32px; } }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.meta { font-size: var(--meta); }
+
+/* Top bar */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 56px; border-bottom: 1px solid var(--hairline); }
+.top h1 { margin: 0; font-size: var(--body); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top .acts { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0; }
+.ghost { background: none; border: 0; padding: 6px 8px; border-radius: var(--r); font-size: var(--meta); color: var(--muted); cursor: pointer; }
+.ghost:hover { color: var(--fg); background: var(--hairline); }
+
+/* Countdown */
+.hero { padding: 40px 0 32px; }
+.count { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: var(--display); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; }
+.count .u { margin-left: 4px; font-size: var(--meta); font-weight: 400; letter-spacing: 0; color: var(--muted); }
+.sub { margin: 12px 0 0; color: var(--muted); }
+
+/* Overview */
+.overview { display: grid; grid-template-columns: 3fr 2fr; gap: 40px; padding: 24px 0 32px; border-top: 1px solid var(--hairline); }
+@media (max-width: 719px) { .overview { grid-template-columns: 1fr; gap: 24px; } }
+h2, h3 { margin: 0; font-size: var(--body); font-weight: 600; }
+.rows { list-style: none; margin: 8px 0 0; padding: 0; }
+.rows li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; padding: 6px 0; border-bottom: 1px solid var(--hairline); }
+.rows li:last-child { border-bottom: 0; }
+.rows .when { font-size: var(--meta); color: var(--muted); text-align: right; white-space: nowrap; }
+.rows .when b { font-weight: 600; color: var(--fg); }
+.rows .lbl { min-width: 0; }
+.rows .lbl small { display: block; font-size: var(--meta); color: var(--muted); }
+.date-in { height: 32px; padding: 0 8px; border: 1px solid var(--hairline); border-radius: var(--r); background: var(--bg); font-size: var(--meta); }
+.prog { display: grid !important; grid-template-columns: 96px 1fr auto; cursor: pointer; }
+.prog:hover .bar i { background: var(--fg); }
+.bar { height: 4px; border-radius: var(--r); background: var(--hairline); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: var(--r); background: var(--fg); }
+.prog .n { font-family: var(--mono); font-size: var(--meta); color: var(--muted); min-width: 48px; text-align: right; }
+
+/* Tabs */
+.tabs { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--hairline); }
+.tabs .wrap { display: flex; gap: 24px; overflow-x: auto; scrollbar-width: none; }
+.tabs .wrap::-webkit-scrollbar { display: none; }
+.tab { flex: none; background: none; border: 0; border-bottom: 2px solid transparent; padding: 14px 0 12px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.tab:hover { color: var(--fg); }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.tab .c { margin-left: 6px; font-family: var(--mono); font-size: var(--meta); color: var(--muted); }
+
+/* Toolbar */
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 16px 0; }
+.search { flex: 1 1 200px; min-width: 0; height: 36px; padding: 0 12px; border: 1px solid var(--hairline); border-radius: var(--r); background: var(--bg); }
+.search:focus { outline: none; border-color: var(--fg); }
+.btn { height: 36px; padding: 0 14px; border: 1px solid var(--hairline); border-radius: var(--r); background: var(--bg); cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--fg); }
+.btn[aria-pressed="true"] { border-color: var(--fg); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-on); font-weight: 500; }
+.seg { display: inline-flex; height: 36px; border: 1px solid var(--hairline); border-radius: var(--r); padding: 2px; }
+.seg button { border: 0; background: none; padding: 0 12px; border-radius: var(--r); color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--hairline); color: var(--fg); }
+
+/* Add form */
+.addform { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 16px; }
+.addform input, .addform select { height: 36px; padding: 0 12px; border: 1px solid var(--hairline); border-radius: var(--r); background: var(--bg); }
+.addform input { flex: 1 1 220px; min-width: 0; }
+.addform input:focus, .addform select:focus { outline: none; border-color: var(--fg); }
+
+/* Lists */
+.group { padding: 8px 0 24px; }
+.gh { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--fg); }
+.gh .c { font-family: var(--mono); font-size: var(--meta); font-weight: 400; color: var(--muted); }
+.note { margin: 12px 0 0; color: var(--muted); font-size: var(--meta); max-width: 64ch; }
+.list { list-style: none; margin: 0; padding: 0; }
+.item { border-bottom: 1px solid var(--hairline); }
+.line { display: grid; grid-template-columns: 32px 1fr; align-items: start; }
+.check { position: relative; display: flex; padding-top: 12px; cursor: pointer; }
+.check input { position: absolute; opacity: 0; width: 20px; height: 20px; margin: 0; cursor: pointer; }
+.check span { display: grid; place-items: center; width: 20px; height: 20px; border: 1.5px solid var(--muted); border-radius: var(--r); transition: background-color 150ms ease-out, border-color 150ms ease-out; }
+.check input:checked + span { background: var(--fg); border-color: var(--fg); }
+.check input:checked + span::after { content: ''; width: 9px; height: 5px; margin-top: -2px; border-left: 2px solid var(--bg); border-bottom: 2px solid var(--bg); transform: rotate(-45deg); }
+.check input:focus-visible + span { outline: 2px solid var(--fg); outline-offset: 2px; }
+.main { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 4px 12px; width: 100%; padding: 10px 0; border: 0; background: none; text-align: left; cursor: pointer; }
+.main .tx { flex: 1 1 220px; min-width: 0; }
+.main .t { overflow-wrap: anywhere; }
+.main .m { display: block; font-size: var(--meta); color: var(--muted); }
+.main .end { display: flex; align-items: center; gap: 8px; margin-left: auto; padding-top: 1px; }
+.item.done .t { color: var(--muted); text-decoration: line-through; }
+.chip { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: var(--meta); white-space: nowrap; }
+.chev { width: 16px; height: 16px; color: var(--muted); transition: transform 150ms ease-out; }
+.main[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.tag { display: inline-block; margin-left: 6px; padding: 0 8px; border: 1px solid var(--hairline); border-radius: var(--r); font-size: var(--meta); line-height: 20px; color: var(--muted); white-space: nowrap; vertical-align: 1px; }
+.tag.on { border-color: var(--accent); background: var(--accent); color: var(--accent-on); }
+.tag.strong { border-color: var(--fg); color: var(--fg); }
+
+/* Detail */
+.detail { display: grid; gap: 16px; padding: 4px 0 20px 32px; }
+.detail h4 { margin: 0 0 6px; font-size: var(--meta); font-weight: 600; }
+.links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: var(--meta); }
+.facts { display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: var(--meta); color: var(--muted); }
+.facts b { font-family: var(--mono); font-weight: 500; color: var(--fg); }
+.log { display: flex; flex-wrap: wrap; gap: 8px; }
+.in { height: 36px; min-width: 0; padding: 0 12px; border: 1px solid var(--hairline); border-radius: var(--r); background: var(--bg); }
+.in:focus, textarea:focus { outline: none; border-color: var(--fg); }
+.in.p { flex: 0 1 120px; font-family: var(--mono); }
+.in.s { flex: 1 1 140px; }
+.hist { list-style: none; margin: 8px 0 0; padding: 0; font-size: var(--meta); }
+.hist li { display: flex; align-items: center; gap: 12px; padding: 4px 0; border-bottom: 1px solid var(--hairline); }
+.hist li:last-child { border-bottom: 0; }
+.hist .d { color: var(--muted); min-width: 52px; }
+.hist .s { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hist .x { border: 0; background: none; color: var(--muted); cursor: pointer; padding: 2px 6px; border-radius: var(--r); }
+.hist .x:hover { color: var(--fg); background: var(--hairline); }
+.spark { display: block; width: 160px; height: 32px; color: var(--fg); }
+.paid { display: flex; align-items: center; gap: 8px; font-size: var(--meta); }
+.paid .in { width: 120px; font-family: var(--mono); }
+textarea { width: 100%; min-height: 64px; padding: 8px 12px; border: 1px solid var(--hairline); border-radius: var(--r); background: var(--bg); resize: vertical; }
+.empty { padding: 32px 0; color: var(--muted); }
+
+/* Links tab */
+.linkrows { list-style: none; margin: 0; padding: 0; }
+.linkrows li { border-bottom: 1px solid var(--hairline); }
+.linkrows a { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 0; text-decoration: none; }
+.linkrows a:hover .lt { text-decoration: underline; }
+.linkrows .host { font-size: var(--meta); color: var(--muted); white-space: nowrap; }
+
+footer { padding: 32px 0 48px; border-top: 1px solid var(--hairline); font-size: var(--meta); color: var(--muted); }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<header class="wrap top">
+  <h1>Move-in list · Dunnellon</h1>
+  <div class="acts">
+    <button class="ghost" id="exportBtn" type="button">Export</button>
+    <button class="ghost" id="importBtn" type="button">Import</button>
+    <button class="ghost" id="themeBtn" type="button">Theme</button>
+    <button class="ghost" id="resetBtn" type="button">Reset</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero" aria-live="off">
+    <div class="count" id="count"></div>
+    <p class="sub" id="countSub"></p>
+  </section>
+
+  <section class="wrap overview">
+    <div>
+      <h2>Coming up</h2>
+      <ul class="rows" id="dates"></ul>
+    </div>
+    <div>
+      <h2>Progress</h2>
+      <ul class="rows" id="progress"></ul>
+    </div>
+  </section>
+
+  <nav class="tabs" aria-label="Lists"><div class="wrap" role="tablist" id="tabs"></div></nav>
+  <div class="wrap">
+    <div class="toolbar" id="toolbar"></div>
+    <div id="addSlot"></div>
+    <section id="panel" role="tabpanel"></section>
+  </div>
+</main>
+
+<footer class="wrap">Checks, prices and notes save in this browser only. Use Export and Import to move them to another device.</footer>
+
+<script>
+(function () {
+'use strict';
+
+// ---------- Data (from the Oct 31 move-in list) ----------
+const HOUSE = [
+  { id: 'h-internet', text: 'Set up internet at the new house (Spectrum)', links: [['Spectrum', 'https://www.spectrum.com/'], ['ISPs in 34433', 'https://ispreports.org/internet-service-providers-34433/']] },
+  { id: 'h-parents-internet', text: "Transfer the current house's internet to your parents so they pay going forward" },
+  { id: 'h-power', text: 'Set up Duke Energy power at the new house', links: [['Duke Energy: start, stop or move', 'https://www.duke-energy.com/home/start-stop-move']] },
+  { id: 'h-solar', text: 'Sort out and sign the solar panel agreement', meta: "Not signed. On hold until written confirmation that the seller's payoff covers all remaining payments" },
+  { id: 'h-deed', text: 'Watch for the recorded deed and final title policy', meta: 'Due about Nov 11–18', links: [['Citrus County Clerk (official records)', 'https://www.citrusclerk.org/']] },
+  { id: 'h-insurance-docs', text: 'Download insurance declarations page and consumer notice', meta: 'Cabrillo Coastal portal', links: [['Cabrillo Coastal', 'https://www.cabrillocoastal.com/']] },
+  { id: 'h-mortgage', text: 'Confirm mortgage servicer, loan number, first payment date and escrow' },
+  { id: 'h-water', text: 'Set up water and sewer service', links: [['Search: Citrus County water and sewer service', 'https://www.google.com/search?q=' + encodeURIComponent('Citrus County water sewer start service 34433')]] },
+  { id: 'h-trash', text: 'Set up trash pickup', links: [['Search: Citrus County trash pickup', 'https://www.google.com/search?q=' + encodeURIComponent('Citrus County residential trash pickup 34433')]] },
+  { id: 'h-homestead', text: 'File homestead exemption with the Citrus County Property Appraiser', meta: 'Due Mar 1, 2027', links: [['Citrus County Property Appraiser', 'https://www.citruspa.org/']] },
+  { id: 'h-usps', text: 'USPS change of address', links: [['USPS change of address', 'https://moversguide.usps.com/']] },
+  { id: 'h-address', text: "Update address: banks, driver's license, car registration, voter registration", links: [['Florida HSMV (license, registration)', 'https://www.flhsmv.gov/'], ['Florida voter registration', 'https://dos.fl.gov/elections/for-voters/voter-registration/']] },
+  { id: 'h-old-insurance', text: 'Move or cancel insurance on the current house' },
+  { id: 'h-keys', text: 'Get keys and remotes from the seller' },
+  { id: 'h-propane', text: 'Propane, well or septic, if the house has them', links: [['Search: propane delivery Dunnellon', 'https://www.google.com/search?q=' + encodeURIComponent('propane delivery Dunnellon FL')]] },
+  { id: 'h-chase', text: 'Chase auto payoff', meta: 'Mailed Oct 29' }
+];
+
+const L = {
+  isp: ['Spectrum and ISPs in 34433', 'https://ispreports.org/internet-service-providers-34433/'],
+  s330: ['eufy S330 Video Smart Lock', 'https://www.eufy.com/products/e85301y1'],
+  c220: ['eufy C220 fingerprint lock', 'https://www.eufy.com/collections/fingerprint-door-lock'],
+  s4: ['eufyCam S4', 'https://www.eufy.com/products/t81721w1'],
+  rat: ['ratgdo32', 'https://ratcloud.llc/collections/frontpage'],
+  disco: ['ratgdo32 disco', 'https://ratcloud.llc/products/ratgdo32-disco'],
+  matic: ['Matic robot vacuum', 'https://buy.maticrobots.com/products/matic'],
+  litter: ['Litter-Robot holiday offers', 'https://www.litter-robot.com/shop-holiday-offers.html'],
+  zbt: ['Home Assistant Connect ZBT-1', 'https://www.home-assistant.io/connectzbt1/']
+};
+
+// group: now = buy first, big = most expensive, bf = wait for Black Friday / Cyber Monday
+const SMART = [
+  { id: 's-spectrum', group: 'now', text: 'Internet: Spectrum (house has none)', ha: 'Good', note: 'up to 1 Gbps, use your own router', chip: '$30–105/mo', links: [L.isp, ['Spectrum', 'https://www.spectrum.com/']], noShop: true },
+  { id: 's-s330', group: 'now', text: 'Front door: eufy S330 Video Smart Lock', ha: 'Caveats', note: 'fingerprint, 2K camera, doorbell', chip: '$299.99–349.99', list: 299.99, links: [L.s330], search: 'eufy S330 video smart lock' },
+  { id: 's-c220', group: 'now', text: 'Back door: eufy C220 fingerprint lock', ha: 'Caveats', chip: '$99.97–109.99', list: 99.97, links: [L.c220], search: 'eufy C220 fingerprint smart lock' },
+  { id: 's-zbt1', group: 'now', text: 'Home Assistant ZBT-1 Zigbee/Thread stick', ha: 'Good', note: 'hub for locks, sensors, plugs', chip: '≈$30–40', list: 30, est: true, links: [L.zbt], search: 'Home Assistant Connect ZBT-1' },
+  { id: 's-leak', group: 'now', text: 'Aqara Zigbee leak sensor (water heater)', ha: 'Good', chip: '≈$20', list: 20, est: true, search: 'Aqara water leak sensor zigbee' },
+  { id: 's-ratgdo', group: 'now', text: 'Garage: ratgdo32 or ratgdo32 disco', ha: 'Good', note: 'no BF sales, buy anytime', chip: '$62 or $94', list: 62, links: [L.rat, L.disco], noShop: true },
+  { id: 's-matic', group: 'big', text: 'Matic robot vacuum', ha: 'Good', note: 'Matter, needs IPv6, direct only', chip: '$1,495', list: 1495, links: [L.matic], noShop: true },
+  { id: 's-litter', group: 'big', bf: true, text: 'Litter-Robot 4 Starter Bundle (also wait for BF)', ha: 'Caveats', note: 'cloud only', chip: '$1,011', list: 1011, target: 861, targetNote: 'last Black Friday price', links: [L.litter], search: 'Litter-Robot 4 bundle' },
+  { id: 's-s4kits', group: 'big', text: 'eufyCam S4 kits', ha: 'Caveats', note: '2-cam $599.99, 4-cam $979.99', chip: '$599.99 / $979.99', list: 599.99, links: [L.s4], search: 'eufyCam S4 kit' },
+  { id: 's-s4', group: 'bf', text: 'Camera: eufyCam S4', ha: 'Caveats', chip: '$349.99', list: 349.99, links: [L.s4], search: 'eufyCam S4' },
+  { id: 's-e340', group: 'bf', text: 'Doorbell: eufy E340 (optional)', ha: 'Caveats', note: 'the S330 already has a doorbell', chip: '$149.99', list: 149.99, search: 'eufy video doorbell E340' },
+  { id: 's-nest', group: 'bf', text: 'Nest Learning Thermostat 4th gen', ha: 'Caveats', note: 'connect via Matter', chip: '$279.99', list: 279.99, target: 224, targetNote: 'BF low $209–224 (estimate)', search: 'Nest Learning Thermostat 4th gen' },
+  { id: 's-hue', group: 'bf', text: 'Philips Hue starter kit (bridge + 2 bulbs)', ha: 'Good', chip: '≈$142', list: 142, est: true, target: 74.99, targetNote: 'last Cyber Monday price', search: 'Philips Hue starter kit bridge' },
+  { id: 's-plugs', group: 'bf', text: 'Smart plugs: Kasa KP125M Matter 4-pack or Eve Energy', ha: 'Good', target: 34, targetNote: 'Kasa Prime Day low', search: 'Kasa KP125M 4 pack' },
+  { id: 's-purifier', group: 'bf', text: 'Air purifier: Levoit Core 300S or 400S', ha: 'Caveats', note: 'cloud via VeSync', chip: '$150 / ≈$215', list: 150, target: 120, targetNote: '300S BF $120, 400S BF $180', search: 'Levoit Core 300S' }
+];
+
+const SMART_NOTES = {
+  now: [
+    "eufy is the pick because it's local, records to microSD, is easy to use, and matches the gear you already have.",
+    "All eufy items connect to Home Assistant through eufy's cloud via a community add-on (eufy_security), which can break if eufy changes its API.",
+    'Backup internet is Verizon 5G Home from $50/mo. ratgdo works only with Security+ 1.0 and 2.0 openers.'
+  ],
+  bf: ['Swaps: ecobee Premium is HA Good through HomeKit ($250, $220 on BF), and IKEA Starkvind is the fully local purifier at ≈$150–190.']
+};
+
+// pri: now = buy first, big = big ticket (buy anytime), bf = wait for Black Friday, extra = by-category extras
+const SHOP_SRC = {
+  now: [
+    ['Toilet paper', 'Bathroom'], ['Paper towels', 'Kitchen'], ['Trash bags + kitchen trash can', 'Kitchen', { search: 'kitchen trash can' }],
+    ['Shower curtain, liner, hooks', 'Bathroom', { search: 'shower curtain liner hooks set' }], ['Bath mat', 'Bathroom'],
+    ['2–3 bath towels', 'Bathroom', { search: 'bath towels' }], ['Sheets + pillow', 'Bedroom', { search: 'bed sheets' }],
+    ['Dish soap', 'Kitchen'], ['Sponges', 'Kitchen'], ['All-purpose cleaner', 'Cleaning'], ['Plunger', 'Bathroom'],
+    ['Toilet brush', 'Bathroom'], ['Hand soap', 'Bathroom'], ['Light bulbs', 'Lighting', { search: 'LED light bulbs' }],
+    ['Flashlight', 'Safety'], ['Basic toolkit', 'Odds & ends', { search: 'home tool kit' }], ['Fire extinguisher', 'Safety'],
+    ['Smoke detector batteries', 'Safety', { search: '9V batteries' }], ['1 pan', 'Kitchen', { search: 'nonstick frying pan' }],
+    ['1 pot', 'Kitchen', { search: 'stock pot' }], ['Knife', 'Kitchen', { search: "chef's knife" }],
+    ['Plates, bowls, cups, utensils', 'Kitchen', { search: 'dinnerware set' }]
+  ],
+  big: [
+    ['Dining table + chairs', 'Furniture', { search: 'dining table set' }], ['Dresser', 'Furniture'],
+    ['Mattress topper or new mattress', 'Bedroom', { search: 'mattress topper' }], ['Washer/dryer if needed', 'Laundry', { search: 'washer dryer' }],
+    ['Patio seating', 'Furniture', { search: 'patio furniture set' }]
+  ],
+  bf: [
+    ['TV + stand', 'Furniture', { big: true, search: 'TV' }], ['Vacuum or robot vacuum', 'Cleaning', { big: true, search: 'vacuum' }],
+    ['Microwave', 'Appliances', { big: true }], ['Air fryer', 'Appliances', { big: true }], ['Coffee maker', 'Appliances', { big: true }],
+    ['Cookware set', 'Kitchen', { big: true }], ['Knife set', 'Kitchen', { big: true }],
+    ['Instant Pot', 'Appliances'], ['Blender', 'Appliances'], ['Bedding + towel sets', 'Bedroom', { search: 'bedding set' }],
+    ['Smart bulbs', 'Lighting', { note: 'See the Hue starter kit in Smart home' }],
+    ['Smart lock / video doorbell', 'Safety', { note: 'The eufy S330 in Smart home covers this', search: 'smart lock video doorbell' }],
+    ['Power tool kit', 'Odds & ends', { search: 'cordless drill combo kit' }], ['Storage furniture', 'Storage', { search: 'storage cabinet' }]
+  ],
+  extra: [
+    ['Cutting board', 'Kitchen'], ['Spatula', 'Kitchen'], ['Tongs', 'Kitchen', { search: 'kitchen tongs' }], ['Measuring cups', 'Kitchen'],
+    ['Can opener', 'Kitchen'], ['Colander', 'Kitchen'], ['Baking sheet', 'Kitchen'], ['Food containers', 'Kitchen', { search: 'food storage containers' }],
+    ['Dish rack', 'Kitchen'], ['Oven mitts', 'Kitchen'],
+    ['Broom + dustpan', 'Cleaning', { search: 'broom and dustpan' }], ['Mop + bucket', 'Cleaning', { search: 'mop and bucket' }], ['Swiffer', 'Cleaning'],
+    ['Glass cleaner', 'Cleaning'], ['Bleach', 'Cleaning'], ['Gloves', 'Cleaning', { search: 'cleaning gloves' }],
+    ['Small trash can', 'Bathroom', { search: 'bathroom trash can' }], ['Toothbrush holder', 'Bathroom'], ['Shower caddy', 'Bathroom'],
+    ['Hamper', 'Laundry', { search: 'laundry hamper' }], ['Detergent', 'Laundry', { search: 'laundry detergent' }], ['Dryer sheets', 'Laundry'],
+    ['Hangers', 'Laundry'], ['Iron', 'Laundry', { search: 'clothes iron' }],
+    ['Lamps', 'Lighting'], ['Nightlights', 'Lighting'],
+    ['Bins', 'Storage', { search: 'storage bins' }], ['Shoe rack', 'Storage'], ['Hooks', 'Storage', { search: 'wall hooks' }],
+    ['CO detector', 'Safety', { search: 'carbon monoxide detector' }], ['First aid kit', 'Safety'], ['Surge protectors', 'Safety', { search: 'surge protector' }],
+    ['Doormat', 'Odds & ends'], ['Curtains', 'Odds & ends'], ['Extension cords', 'Odds & ends'], ['Step stool', 'Odds & ends'], ['Garden hose', 'Odds & ends']
+  ]
+};
+
+const PRI = { now: 'Buy first', big: 'Big ticket', bf: 'Wait for Black Friday', extra: 'Extras' };
+const PRI_TAG = { now: 'Buy first', big: 'Big ticket', bf: 'BF', extra: 'Extra' };
+const CATS = ['Kitchen', 'Appliances', 'Bathroom', 'Bedroom', 'Cleaning', 'Laundry', 'Furniture', 'Lighting', 'Storage', 'Safety', 'Odds & ends'];
+
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const SHOP = [];
+Object.keys(SHOP_SRC).forEach(pri => SHOP_SRC[pri].forEach(([text, cat, o]) => SHOP.push(Object.assign({ id: 'p-' + slug(text), text, cat, pri }, o || {}))));
+
+const LINK_GROUPS = [
+  ['From your list', [L.isp, L.s330, L.c220, L.s4, L.rat, L.disco, L.matic, L.litter]],
+  ['House setup', [
+    ['Spectrum', 'https://www.spectrum.com/'],
+    ['Duke Energy: start, stop or move service', 'https://www.duke-energy.com/home/start-stop-move'],
+    ['USPS change of address', 'https://moversguide.usps.com/'],
+    ['Citrus County Property Appraiser (homestead)', 'https://www.citruspa.org/'],
+    ['Citrus County Clerk (recorded deed)', 'https://www.citrusclerk.org/'],
+    ['Florida HSMV (license, registration)', 'https://www.flhsmv.gov/'],
+    ['Florida voter registration', 'https://dos.fl.gov/elections/for-voters/voter-registration/'],
+    ['Cabrillo Coastal (insurance portal)', 'https://www.cabrillocoastal.com/'],
+    L.zbt
+  ]],
+  ['Prices and deals', [
+    ['Google Shopping', 'https://shopping.google.com/'],
+    ['CamelCamelCamel (Amazon price history)', 'https://camelcamelcamel.com/'],
+    ['Slickdeals', 'https://slickdeals.net/']
+  ]]
+];
+
+const BF_START = new Date(2026, 10, 27);   // Black Friday, Fri Nov 27 2026, local midnight
+const SALES_END = new Date(2026, 11, 1);    // end of Cyber Monday, Nov 30
+const DATES = [
+  { key: 'move', label: 'Move-in day' },
+  { label: 'Recorded deed and title policy', start: '2026-11-11', end: '2026-11-18', task: 'h-deed' },
+  { label: 'Black Friday', start: '2026-11-27' },
+  { label: 'Cyber Monday', start: '2026-11-30' },
+  { label: 'Homestead exemption due', start: '2027-03-01', task: 'h-homestead' }
+];
+
+// ---------- State ----------
+const KEY = 'movein-dunnellon-v1';
+const DEFAULTS = () => ({ done: { 'h-chase': true }, prices: {}, paid: {}, notes: {}, custom: [], moveIn: '', hideDone: false, view: 'priority', tab: 'house', theme: 'auto' });
+let S = load();
+const OPEN = new Set();
+let query = '';
+let adding = false;
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) return Object.assign(DEFAULTS(), JSON.parse(raw));
+  } catch (e) {}
+  return DEFAULTS();
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+const allShop = () => SHOP.concat(S.custom);
+const bfItems = () => SMART.filter(i => i.group === 'bf' || i.bf).concat(allShop().filter(i => i.pri === 'bf'));
+function findItem(id) { return HOUSE.concat(SMART, allShop()).find(i => i.id === id); }
+
+// ---------- Helpers ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+const parseMoney = v => { const n = parseFloat(String(v).replace(/[^0-9.]/g, '')); return isFinite(n) && n > 0 ? n : null; };
+const dayMs = 864e5;
+const ymd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const today = () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); };
+const fmtDate = (d, withYear) => d.toLocaleDateString('en-US', Object.assign({ weekday: 'short', month: 'short', day: 'numeric' }, withYear ? { year: 'numeric' } : {}));
+const shortDate = ts => new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+const count = list => list.filter(i => S.done[i.id]).length;
+
+function rel(days) {
+  if (days === 0) return 'today';
+  if (days === 1) return 'tomorrow';
+  if (days > 1) return 'in ' + days + ' days';
+  return -days === 1 ? 'yesterday' : -days + ' days ago';
+}
+
+function shopLinks(term) {
+  const q = encodeURIComponent(term);
+  return [
+    ['Google Shopping', 'https://www.google.com/search?tbm=shop&q=' + q],
+    ['Amazon', 'https://www.amazon.com/s?k=' + q],
+    ['Walmart', 'https://www.walmart.com/search?q=' + q],
+    ['Target', 'https://www.target.com/s?searchTerm=' + q],
+    ['Price history', 'https://camelcamelcamel.com/search?sq=' + q]
+  ];
+}
+
+function priceLog(id) { return S.prices[id] || []; }
+function latest(id) { const l = priceLog(id); return l.length ? l[l.length - 1] : null; }
+function lowest(id) { const l = priceLog(id); return l.length ? l.reduce((a, b) => (b.p < a.p ? b : a)) : null; }
+
+// ---------- Countdown ----------
+function tick() {
+  const now = new Date();
+  let target, sub;
+  if (now < BF_START) {
+    target = BF_START;
+    sub = 'until Black Friday, Friday Nov 27. Cyber Monday is Nov 30.';
+  } else if (now < SALES_END) {
+    target = SALES_END;
+    sub = 'left in the sales. Cyber Monday ends Nov 30 at midnight.';
+  } else {
+    $('#count').textContent = 'Sales are over';
+    $('#countSub').textContent = 'Black Friday and Cyber Monday 2026 have ended.';
+    return;
+  }
+  let s = Math.max(0, Math.floor((target - now) / 1000));
+  const d = Math.floor(s / 86400); s -= d * 86400;
+  const h = Math.floor(s / 3600); s -= h * 3600;
+  const m = Math.floor(s / 60); s -= m * 60;
+  const p = n => String(n).padStart(2, '0');
+  $('#count').innerHTML = [[d, 'days'], [p(h), 'hrs'], [p(m), 'min'], [p(s), 'sec']]
+    .map(([n, u]) => '<span>' + n + '<span class="u">' + u + '</span></span>').join('');
+  $('#count').setAttribute('aria-label', d + ' days ' + h + ' hours ' + m + ' minutes ' + sub);
+  $('#countSub').textContent = sub;
+}
+
+// ---------- Overview ----------
+function renderDates() {
+  const t = today();
+  const rows = [];
+  DATES.forEach(ev => {
+    if (ev.key === 'move') {
+      const d = S.moveIn ? ymd(S.moveIn) : null;
+      const diff = d ? Math.round((d - t) / dayMs) : null;
+      rows.push({ sort: d ? d.getTime() : t.getTime() + 3 * dayMs, html:
+        '<li><span class="lbl">Move-in day' + (d ? '<small>' + fmtDate(d) + '</small>' : '<small>Next week. Set the date.</small>') + '</span>' +
+        '<span class="when">' + (d ? '<b>' + rel(diff) + '</b> ' : '') +
+        '<label class="vh" for="moveIn">Move-in date</label><input class="date-in" type="date" id="moveIn" value="' + esc(S.moveIn) + '"></span></li>' });
+      return;
+    }
+    const start = ymd(ev.start), end = ev.end ? ymd(ev.end) : start;
+    const done = ev.task && S.done[ev.task];
+    let when;
+    if (done) when = 'done';
+    else if (t > end) { if (!ev.task) return; when = '<b>overdue</b>'; }
+    else if (t >= start) when = '<b>now</b>';
+    else when = '<b>' + rel(Math.round((start - t) / dayMs)) + '</b>';
+    const label = ev.end ? fmtDate(start) + ' – ' + end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : fmtDate(start, start.getFullYear() !== 2026);
+    rows.push({ sort: start.getTime(), html: '<li><span class="lbl">' + esc(ev.label) + '<small>' + label + '</small></span><span class="when">' + when + '</span></li>' });
+  });
+  rows.sort((a, b) => a.sort - b.sort);
+  $('#dates').innerHTML = rows.map(r => r.html).join('');
+}
+
+function renderProgress() {
+  const sets = [['house', 'House', HOUSE], ['smart', 'Smart home', SMART], ['shop', 'Shopping', allShop()], ['bf', 'Black Friday', bfItems()]];
+  let html = sets.map(([tab, label, list]) => {
+    const n = count(list), pct = list.length ? Math.round(n / list.length * 100) : 0;
+    return '<li class="prog" data-tab="' + tab + '" role="button" tabindex="0" aria-label="' + label + ': ' + n + ' of ' + list.length + ' done"><span>' + label + '</span>' +
+      '<span class="bar"><i style="width:' + pct + '%"></i></span><span class="n">' + n + '/' + list.length + '</span></li>';
+  }).join('');
+  let spent = 0, saved = 0;
+  Object.keys(S.paid).forEach(id => {
+    const p = S.paid[id]; if (!p) return;
+    spent += p;
+    const it = findItem(id);
+    if (it && it.list && it.list > p) saved += it.list - p;
+  });
+  html += '<li><span>Spent</span><span class="when"><b class="mono">' + money(spent) + '</b>' + (saved ? ' · saved ' + money(saved) + ' vs list' : '') + '</span></li>';
+  $('#progress').innerHTML = html;
+}
+
+// ---------- Tabs and toolbar ----------
+const TABS = [['house', 'House', () => HOUSE], ['smart', 'Smart home', () => SMART], ['shop', 'Shopping', allShop], ['bf', 'Black Friday', bfItems], ['links', 'Links', null]];
+
+function renderTabs() {
+  $('#tabs').innerHTML = TABS.map(([id, label, list]) => {
+    const l = list && list();
+    return '<button class="tab" role="tab" type="button" data-tab="' + id + '" aria-selected="' + (S.tab === id) + '">' + label +
+      (l ? '<span class="c">' + count(l) + '/' + l.length + '</span>' : '') + '</button>';
+  }).join('');
+}
+
+function renderToolbar() {
+  if (S.tab === 'links') { $('#toolbar').innerHTML = ''; $('#addSlot').innerHTML = ''; return; }
+  let html = '<label class="vh" for="q">Search this list</label><input class="search" id="q" type="search" placeholder="Search" value="' + esc(query) + '" autocomplete="off">' +
+    '<button class="btn" type="button" id="hideDone" aria-pressed="' + !!S.hideDone + '">Hide done</button>';
+  if (S.tab === 'shop') {
+    html += '<span class="seg" role="group" aria-label="Group by"><button type="button" data-view="priority" aria-pressed="' + (S.view === 'priority') + '">Priority</button>' +
+      '<button type="button" data-view="category" aria-pressed="' + (S.view === 'category') + '">Category</button></span>' +
+      '<button class="btn primary" type="button" id="addBtn" aria-expanded="' + adding + '">Add item</button>';
+  }
+  $('#toolbar').innerHTML = html;
+  renderAddForm();
+}
+
+function renderAddForm() {
+  if (S.tab !== 'shop' || !adding) { $('#addSlot').innerHTML = ''; return; }
+  $('#addSlot').innerHTML = '<form class="addform" id="addForm">' +
+    '<label class="vh" for="addText">Item</label><input id="addText" placeholder="Item name" required autocomplete="off">' +
+    '<label class="vh" for="addPri">Priority</label><select id="addPri">' + Object.keys(PRI).map(k => '<option value="' + k + '">' + PRI[k] + '</option>').join('') + '</select>' +
+    '<label class="vh" for="addCat">Category</label><select id="addCat">' + CATS.map(c => '<option>' + esc(c) + '</option>').join('') + '</select>' +
+    '<button class="btn" type="submit">Save</button><button class="btn" type="button" id="addCancel">Cancel</button></form>';
+  $('#addText').focus();
+}
+
+// ---------- Rows ----------
+const CHEV = '<svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>';
+
+function matches(it) {
+  if (S.hideDone && S.done[it.id]) return false;
+  if (!query) return true;
+  const hay = [it.text, it.meta, it.note, it.cat, it.ha && 'HA ' + it.ha, S.notes[it.id]].join(' ').toLowerCase();
+  return query.toLowerCase().split(/\s+/).every(w => hay.includes(w));
+}
+
+function metaFor(it, ctx) {
+  const parts = [];
+  if (it.ha) parts.push('HA ' + it.ha);
+  if (it.meta) parts.push(it.meta);
+  if (it.note) parts.push(it.note);
+  if (it.cat && ctx !== 'category') parts.push(it.cat);
+  const last = latest(it.id);
+  if (last) parts.push('Seen ' + money(last.p) + (last.s ? ' at ' + last.s : '') + ', ' + shortDate(last.t));
+  if (S.paid[it.id]) parts.push('Paid ' + money(S.paid[it.id]));
+  if (S.notes[it.id]) parts.push('Has a note');
+  return parts.join(' · ');
+}
+
+function tagsFor(it, ctx) {
+  let t = '';
+  if (it.pri && (ctx === 'category' || ctx === 'bf')) {
+    if (it.pri === 'now') t += '<span class="tag on">Buy first</span>';
+    else if (ctx !== 'bf') t += '<span class="tag">' + PRI_TAG[it.pri] + '</span>';
+  }
+  if (it.group === 'now' && ctx === 'bf') t += '<span class="tag on">Buy first</span>';
+  if (it.big && ctx !== 'category') t += '<span class="tag">Big ticket</span>';
+  const last = latest(it.id);
+  if (it.target && last && last.p <= it.target && !S.done[it.id]) t += '<span class="tag on">At target</span>';
+  if (it.custom) t += '<span class="tag">Added</span>';
+  return t;
+}
+
+function chipFor(it, ctx) {
+  if (ctx === 'bf' && it.target) return (it.list ? money(it.list) + ' → ' : 'target ') + money(it.target);
+  return it.chip || '';
+}
+
+function row(it, ctx) {
+  const done = !!S.done[it.id];
+  const open = OPEN.has(it.id);
+  const meta = metaFor(it, ctx);
+  return '<li class="item' + (done ? ' done' : '') + '" data-id="' + esc(it.id) + '">' +
+    '<div class="line"><label class="check"><input type="checkbox" data-act="toggle"' + (done ? ' checked' : '') + ' aria-label="Done: ' + esc(it.text) + '"><span></span></label>' +
+    '<button class="main" type="button" data-act="open" aria-expanded="' + open + '">' +
+    '<span class="tx"><span class="t">' + esc(it.text) + '</span>' + tagsFor(it, ctx) + (meta ? '<span class="m">' + esc(meta) + '</span>' : '') + '</span>' +
+    '<span class="end">' + (chipFor(it, ctx) ? '<span class="chip">' + esc(chipFor(it, ctx)) + '</span>' : '') + CHEV + '</span></button></div>' +
+    (open ? detail(it) : '') + '</li>';
+}
+
+function spark(log, target) {
+  if (log.length < 2) return '';
+  const w = 160, h = 32, pad = 3;
+  const vals = log.map(e => e.p).concat(target ? [target] : []);
+  const min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+  const y = v => max === min ? h / 2 : pad + (h - 2 * pad) * (1 - (v - min) / (max - min));
+  const x = i => pad + (w - 2 * pad) * (i / (log.length - 1));
+  const pts = log.map((e, i) => x(i).toFixed(1) + ',' + y(e.p).toFixed(1)).join(' ');
+  const tl = target ? '<line x1="0" x2="' + w + '" y1="' + y(target).toFixed(1) + '" y2="' + y(target).toFixed(1) + '" stroke="var(--muted)" stroke-dasharray="3 3" stroke-width="1"/>' : '';
+  return '<svg class="spark" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Price trend">' + tl +
+    '<polyline points="' + pts + '" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+}
+
+function detail(it) {
+  const isTask = it.id.startsWith('h-');
+  const links = (it.links || []).slice();
+  if (!isTask && !it.noShop) shopLinks(it.search || it.text.replace(/\(.*?\)/g, '').replace(/\+/g, ' ')).forEach(l => links.push(l));
+  let html = '<div class="detail">';
+  if (links.length) {
+    html += '<div><h4>Links</h4><div class="links">' + links.map(([t, u]) => '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(t) + '</a>').join('') + '</div></div>';
+  }
+  if (!isTask) {
+    const log = priceLog(it.id), low = lowest(it.id);
+    const facts = [];
+    if (it.chip) facts.push('List <b>' + esc(it.chip) + '</b>' + (it.est ? ' (estimate)' : ''));
+    if (it.target) facts.push('Target <b>' + money(it.target) + '</b>' + (it.targetNote ? ' · ' + esc(it.targetNote) : ''));
+    if (low) facts.push('Lowest seen <b>' + money(low.p) + '</b>' + (low.s ? ' at ' + esc(low.s) : '') + ', ' + shortDate(low.t));
+    html += '<div><h4>Price tracking</h4>' + (facts.length ? '<div class="facts">' + facts.join('') + '</div>' : '') +
+      '<div class="log" style="margin-top:8px"><label class="vh" for="p-' + esc(it.id) + '">Price seen</label><input class="in p" id="p-' + esc(it.id) + '" data-f="price" inputmode="decimal" placeholder="$ price">' +
+      '<label class="vh" for="s-' + esc(it.id) + '">Store</label><input class="in s" id="s-' + esc(it.id) + '" data-f="store" placeholder="Store (optional)">' +
+      '<button class="btn" type="button" data-act="log">Log price</button></div>';
+    if (log.length) {
+      html += '<div style="margin-top:12px">' + spark(log, it.target) + '<ul class="hist">' +
+        log.map((e, i) => ({ e, i })).reverse().map(({ e, i }) =>
+          '<li><span class="d">' + shortDate(e.t) + '</span><span class="s">' + esc(e.s || '—') + '</span><span class="mono">' + money(e.p) + '</span>' +
+          '<button class="x" type="button" data-act="delprice" data-i="' + i + '" aria-label="Remove ' + money(e.p) + ' entry">✕</button></li>').join('') + '</ul></div>';
+    }
+    html += '</div><label class="paid">Paid <input class="in" data-f="paid" inputmode="decimal" placeholder="$ amount" value="' + (S.paid[it.id] ? esc(S.paid[it.id]) : '') + '"></label>';
+  }
+  html += '<div><label class="vh" for="n-' + esc(it.id) + '">Notes</label><textarea id="n-' + esc(it.id) + '" data-f="note" placeholder="Notes">' + esc(S.notes[it.id] || '') + '</textarea></div>';
+  if (it.custom) html += '<div><button class="btn" type="button" data-act="delitem">Remove this item</button></div>';
+  return html + '</div>';
+}
+
+function group(title, list, ctx, notes) {
+  const shown = list.filter(matches);
+  if (!shown.length && (query || S.hideDone)) return '';
+  return '<div class="group"><h3 class="gh"><span>' + esc(title) + '</span><span class="c">' + count(list) + '/' + list.length + '</span></h3>' +
+    (shown.length ? '<ul class="list">' + shown.map(i => row(i, ctx)).join('') + '</ul>' : '<p class="note">Nothing here yet.</p>') +
+    (notes || []).map(n => '<p class="note">' + esc(n) + '</p>').join('') + '</div>';
+}
+
+// ---------- Panels ----------
+function renderPanel() {
+  let html = '';
+  if (S.tab === 'house') {
+    html = group('House transfer checklist', HOUSE, 'house', ['Separate from the shopping list. Status as of Oct 31.']);
+  } else if (S.tab === 'smart') {
+    html = group('Buy first', SMART.filter(i => i.group === 'now'), 'smart', SMART_NOTES.now) +
+      group('Most expensive', SMART.filter(i => i.group === 'big'), 'smart') +
+      group('Wait for Black Friday / Cyber Monday', SMART.filter(i => i.group === 'bf'), 'smart', SMART_NOTES.bf);
+  } else if (S.tab === 'shop') {
+    const items = allShop();
+    if (S.view === 'priority') {
+      html = group(PRI.now, items.filter(i => i.pri === 'now'), 'priority', ['Bed, couch and porch tables stay with the house.']) +
+        group(PRI.big, items.filter(i => i.pri === 'big'), 'priority', ['No sale overlap. Buy whenever.']) +
+        group(PRI.bf, items.filter(i => i.pri === 'bf'), 'priority', ['TV, vacuum, microwave, air fryer, coffee maker, cookware and knife sets are big ticket too, so hold them. Usually 20–50% off.']) +
+        group(PRI.extra, items.filter(i => i.pri === 'extra'), 'priority');
+    } else {
+      html = CATS.map(c => group(c, items.filter(i => i.cat === c), 'category')).join('');
+    }
+  } else if (S.tab === 'bf') {
+    const list = bfItems();
+    let save = 0;
+    list.forEach(i => { if (i.list && i.target && i.list > i.target) save += i.list - i.target; });
+    html = '<p class="note" style="margin:0 0 8px">Black Friday is Nov 27, Cyber Monday Nov 30. Usually 20–50% off. Known targets save about ' + money(Math.round(save)) + ' against list.</p>' +
+      group('Smart home', list.filter(i => i.id.startsWith('s-')), 'bf') +
+      group('Household', list.filter(i => !i.id.startsWith('s-')), 'bf');
+  } else if (S.tab === 'links') {
+    html = LINK_GROUPS.map(([title, links]) => '<div class="group"><h3 class="gh"><span>' + esc(title) + '</span></h3><ul class="linkrows">' +
+      links.map(([t, u]) => '<li><a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer"><span class="lt">' + esc(t) + '</span><span class="host">' + esc(new URL(u).hostname.replace(/^www\./, '')) + '</span></a></li>').join('') +
+      '</ul></div>').join('');
+  }
+  if (!html) html = '<p class="empty">Nothing matches. Clear the search or show done items.</p>';
+  $('#panel').innerHTML = html;
+}
+
+function renderAll() { renderTabs(); renderProgress(); renderDates(); renderPanel(); }
+
+function applyTheme() {
+  if (S.theme === 'auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', S.theme);
+  $('#themeBtn').textContent = 'Theme: ' + S.theme[0].toUpperCase() + S.theme.slice(1);
+}
+
+// ---------- Events ----------
+function setTab(tab) {
+  S.tab = tab; save();
+  renderTabs(); renderToolbar(); renderPanel();
+}
+
+$('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
+$('#tabs').addEventListener('keydown', e => {
+  if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+  const i = TABS.findIndex(t => t[0] === S.tab), n = (i + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length;
+  setTab(TABS[n][0]);
+  $('#tabs [aria-selected="true"]').focus();
+});
+$('#progress').addEventListener('click', e => {
+  const r = e.target.closest('[data-tab]'); if (!r) return;
+  setTab(r.dataset.tab);
+  document.querySelector('.tabs').scrollIntoView({ block: 'start' });
+});
+$('#progress').addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.dataset.tab) { e.preventDefault(); e.target.click(); } });
+$('#dates').addEventListener('change', e => { if (e.target.id === 'moveIn') { S.moveIn = e.target.value; save(); renderDates(); } });
+
+$('#toolbar').addEventListener('input', e => { if (e.target.id === 'q') { query = e.target.value.trim(); renderPanel(); } });
+$('#toolbar').addEventListener('click', e => {
+  if (e.target.closest('#hideDone')) { S.hideDone = !S.hideDone; save(); renderToolbar(); renderPanel(); }
+  const v = e.target.closest('[data-view]'); if (v) { S.view = v.dataset.view; save(); renderToolbar(); renderPanel(); }
+  if (e.target.closest('#addBtn')) { adding = !adding; renderToolbar(); }
+});
+$('#addSlot').addEventListener('click', e => { if (e.target.id === 'addCancel') { adding = false; renderToolbar(); } });
+$('#addSlot').addEventListener('submit', e => {
+  e.preventDefault();
+  const text = $('#addText').value.trim(); if (!text) return;
+  S.custom.push({ id: 'c-' + Date.now().toString(36), text, pri: $('#addPri').value, cat: $('#addCat').value, custom: true });
+  save(); adding = false; renderToolbar(); renderAll();
+});
+
+function logPrice(li) {
+  const id = li.dataset.id;
+  const p = parseMoney(li.querySelector('[data-f="price"]').value);
+  if (p == null) { li.querySelector('[data-f="price"]').focus(); return; }
+  const s = li.querySelector('[data-f="store"]').value.trim().slice(0, 40);
+  (S.prices[id] = S.prices[id] || []).push({ p, s, t: Date.now() });
+  save(); renderAll();
+  const again = $('#panel [data-id="' + CSS.escape(id) + '"] [data-f="price"]'); if (again) again.focus();
+}
+
+$('#panel').addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if (!t) return;
+  const li = t.closest('[data-id]'); if (!li) return;
+  const id = li.dataset.id;
+  const act = t.dataset.act;
+  if (act === 'open') {
+    OPEN.has(id) ? OPEN.delete(id) : OPEN.add(id);
+    renderPanel();
+    const b = $('#panel [data-id="' + CSS.escape(id) + '"] .main'); if (b) b.focus();
+  } else if (act === 'log') {
+    logPrice(li);
+  } else if (act === 'delprice') {
+    S.prices[id].splice(+t.dataset.i, 1);
+    if (!S.prices[id].length) delete S.prices[id];
+    save(); renderAll();
+  } else if (act === 'delitem') {
+    S.custom = S.custom.filter(i => i.id !== id);
+    delete S.done[id]; delete S.prices[id]; delete S.paid[id]; delete S.notes[id];
+    OPEN.delete(id); save(); renderAll();
+  }
+});
+$('#panel').addEventListener('change', e => {
+  const li = e.target.closest('[data-id]'); if (!li) return;
+  const id = li.dataset.id;
+  if (e.target.dataset.act === 'toggle') {
+    if (e.target.checked) S.done[id] = true; else delete S.done[id];
+    save(); renderAll();
+    const c = $('#panel [data-id="' + CSS.escape(id) + '"] input[type="checkbox"]'); if (c) c.focus();
+  } else if (e.target.dataset.f === 'paid') {
+    const p = parseMoney(e.target.value);
+    if (p == null) delete S.paid[id]; else { S.paid[id] = p; S.done[id] = true; }
+    save(); renderAll();
+  }
+});
+$('#panel').addEventListener('input', e => {
+  if (e.target.dataset.f !== 'note') return;
+  const id = e.target.closest('[data-id]').dataset.id;
+  const v = e.target.value;
+  if (v.trim()) S.notes[id] = v; else delete S.notes[id];
+  save();
+});
+$('#panel').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.target.dataset.f === 'price' || e.target.dataset.f === 'store')) { e.preventDefault(); logPrice(e.target.closest('[data-id]')); }
+});
+
+$('#themeBtn').addEventListener('click', () => {
+  S.theme = { auto: 'light', light: 'dark', dark: 'auto' }[S.theme] || 'auto';
+  save(); applyTheme();
+});
+$('#exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(Object.assign({ exported: new Date().toISOString() }, S), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'move-in-progress-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('#importBtn').addEventListener('click', () => $('#importFile').click());
+$('#importFile').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  f.text().then(txt => {
+    const data = JSON.parse(txt);
+    if (!data || typeof data !== 'object' || typeof data.done !== 'object') throw new Error('bad file');
+    delete data.exported;
+    S = Object.assign(DEFAULTS(), data);
+    save(); applyTheme(); renderToolbar(); renderAll();
+    alert('Progress imported.');
+  }).catch(() => alert('That file is not a move-in progress export.'));
+  e.target.value = '';
+});
+$('#resetBtn').addEventListener('click', () => {
+  if (!confirm('Clear all checks, logged prices, paid amounts, notes and added items in this browser?')) return;
+  const theme = S.theme;
+  S = DEFAULTS(); S.theme = theme; OPEN.clear(); query = '';
+  save(); renderToolbar(); renderAll();
+});
+
+// ---------- Start ----------
+applyTheme();
+tick();
+setInterval(tick, 1000);
+renderToolbar();
+renderAll();
+// Refresh the "in N days" labels when the day rolls over.
+let shownDay = today().getTime();
+setInterval(() => { const d = today().getTime(); if (d !== shownDay) { shownDay = d; renderDates(); } }, 60 * 1000);
+})();
+</script>
+</body>
+</html>
